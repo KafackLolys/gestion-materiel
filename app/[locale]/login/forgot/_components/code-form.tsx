@@ -5,9 +5,9 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "../../../../../components/ui/input-otp";
 import {useFormStateStore} from "../stores/use-switch-store";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../../lib/utils";
 export const CodeForm = () => {
   const { content, setContent } = useFormStateStore();
   return (

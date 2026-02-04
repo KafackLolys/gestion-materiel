@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../../lib/utils";
 import { PiPasswordDuotone } from "react-icons/pi";
 import { useFormStateStore } from "../stores/use-switch-store";
 export const EmailForm = () => {

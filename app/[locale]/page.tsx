@@ -1,11 +1,16 @@
+"use client";
 import Image from "next/image";
-import Link from "next/link";
 import LogoutButton from "./components/log-out-button";
+import Link from "next/link";
+import { useI18n, useScopedI18n } from "../../locales/client";
 
 export default function Home() {
+  const t = useI18n();
+  //const scopedT = useScopedI18n('hello');
   return (
     <div className="flex min-h-screen flex-col gap-10 items-center justify-between p-24">
       <header className="flex items-center justify-between w-full">
+        <p>{t('hello')}</p>
         <h1>Home page</h1>
         <LogoutButton />
       </header>

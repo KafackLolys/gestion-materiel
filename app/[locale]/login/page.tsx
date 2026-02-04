@@ -1,11 +1,11 @@
 "use client";
-import Link from "next/link";
 import { FaUser } from "react-icons/fa6";
 import { BiSolidLockAlt } from "react-icons/bi";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const loginSchema = z.object({
   login: z.string().min(1, "Username requis"),
@@ -41,14 +41,14 @@ export default function LoginPage() {
 
     if (result?.ok) {
       alert("Connexion réussie !");
-      router.push("/");
+      router.push("/dashboard");
     } else {
       setError("login ou mot de passe incorrect");
     }
     if (session) {
     // si l'utilisateur est déjà connecté, on redirige vers dashboard
     alert("Vous êtes déjà connecté !");
-    router.push("/");
+    router.push("/dashboard");
     return null;
   }
   }
