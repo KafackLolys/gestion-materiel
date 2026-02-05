@@ -1,16 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import LogoutButton from "../components/log-out-button";
 import { useUsers } from "../../../hooks/use-users";
 import { createUser, updateUser, deleteUser } from "../../../services/user-service";
 import { userRoutes } from "../../../lib/routes/user";
+import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
   const { users, isLoading, isError } = useUsers();
   const [form, setForm] = useState({ name: "", email: "", id: "" });
   const [isEditing, setIsEditing] = useState(false);
-
+  const { data: session, status } = useSession();
+  // useEffect(() => {
+  //   if (status === "authenticated") {
+  //     console.log("SESSION FRONTEND :", session);
+  //     console.log("ACCESS TOKEN :", session?.accessToken);
+  //   }
+  // }, [session, status]);
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Erreur lors du chargement des utilisateurs</p>;
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,6 +92,7 @@ export default function DashboardPage() {
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
+            <th className="border border-gray-300 px-4 py-2">id</th>
             <th className="border border-gray-300 px-4 py-2">Nom</th>
             <th className="border border-gray-300 px-4 py-2">Email</th>
             <th className="border border-gray-300 px-4 py-2">Actions</th>
@@ -94,6 +102,7 @@ export default function DashboardPage() {
           {users &&
             users.map((user: any) => (
               <tr key={user.id} className="hover:bg-gray-50">
+                <td className="border border-gray-300 px-4 py-2">{user.id}</td>
                 <td className="border border-gray-300 px-4 py-2">{user.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{user.email}</td>
                 <td className="border border-gray-300 px-4 py-2 flex gap-2">

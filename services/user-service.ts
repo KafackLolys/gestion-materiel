@@ -1,9 +1,17 @@
+// services/user-service.ts
+import { toast } from "sonner";
 import { userRoutes } from "../lib/routes/user";
+import { getSession } from "next-auth/react";
 
 export async function request(route: typeof userRoutes[keyof typeof userRoutes], body?: any) {
+  const session = await getSession();
+  const token = session?.accessToken;
+
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const options: RequestInit = {
     method: route.method,
-    headers: { "Content-Type": "application/json" },
+    headers,
     credentials: "include",
   };
 
@@ -11,8 +19,12 @@ export async function request(route: typeof userRoutes[keyof typeof userRoutes],
 
   const res = await fetch(route.url, options);
 
-  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
+  if (!res.ok) { 
+    const errorData = await res.json().catch(() => ({}));
+     const errorMessage = errorData?.message || `Erreur: ${res.status}`;
+     toast.error(errorMessage);
+     throw new Error(errorMessage);
+  }
 
   return res.json();
 }

@@ -3,6 +3,7 @@ import Image from "next/image";
 import LogoutButton from "./components/log-out-button";
 import Link from "next/link";
 import { useI18n, useScopedI18n } from "../../locales/client";
+import ChangeLocale from "./components/change-locale";
 
 export default function Home() {
   const t = useI18n();
@@ -12,8 +13,10 @@ export default function Home() {
       <header className="flex items-center justify-between w-full">
         <p>{t('hello')}</p>
         <h1>Home page</h1>
+        <ChangeLocale />
         <LogoutButton />
       </header>
+      <p>{t('presentation', { nom: 'Jean Dupont' })}</p>
       <Link
         href="/login"
         className="bg-gray-100 text-black px-10 py-5 rounded-xl"
