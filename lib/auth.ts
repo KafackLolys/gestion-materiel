@@ -1,3 +1,4 @@
+// lib/auth.ts
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { db } from "./db";
@@ -5,36 +6,14 @@ import { loginSchema } from "./validators/auth";
 import type { RowDataPacket } from "mysql2/promise";
 import type { AuthOptions, SessionStrategy } from "next-auth";
 import type { DefaultUser } from "next-auth";
+import jwt from "jsonwebtoken";
+import { toast } from "sonner";
 
-declare module "next-auth" {
-  interface User extends DefaultUser {
-    login?: string;
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    login?: string;
-    email?: string;
-  }
-}
-
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id?: string;
-      login?: string;
-      name?: string | null;
-      email?: string | null;
-    };
-  }
-}
-
-// ⚡ Définir le type exact pour la session
+// ================= CONFIG =================
 const sessionStrategy: SessionStrategy = "jwt";
 
 export const authOptions: AuthOptions = {
+  debug: true,
   session: {
     strategy: sessionStrategy,
     maxAge: 60 * 60 * 24, // 1 jour
@@ -76,26 +55,45 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    // 🔑 ajouter les infos utilisateur dans le token JWT
+    // ================= JWT =================
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.login = user.login;
-        if (user.email) {
-          token.email = user.email;
+        token.email = user.email;
+
+        if (!process.env.JWT_SECRET) {
+          throw new Error("JWT_SECRET manquant");
         }
+
+        const signedToken = jwt.sign(
+          {
+            id: user.id,
+            login: user.login,
+            email: user.email,
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: "1d" }, // expiration 1 jour
+        );
+
+        token.accessToken = signedToken; // token JWT exposé au frontend via session callback
+        // : affichage console
+        //console.log("JWT GÉNÉRÉ :", token.accessToken);
       }
+
       return token;
     },
-    // 🔑 mettre les infos du token dans la session côté frontend
+    // ================= SESSION =================
     async session({ session, token }) {
-      if (token) {
-        session.user = {
-          id: token.id as string,
-          login: token.login as string,
-          email: token.email as string,
-        };
-      }
+      session.user = {
+        id: token.id as string,
+        login: token.login as string,
+        email: token.email as string,
+      };
+      // ⚡ exposer le JWT signé au frontend
+      session.accessToken = token.accessToken as string;
+
+      //console.log("SESSION CALLBACK - ACCESS TOKEN :", session.accessToken);
       return session;
     },
   },

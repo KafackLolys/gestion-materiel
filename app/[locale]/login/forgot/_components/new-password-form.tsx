@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../../lib/utils";
 import { MdLockReset } from "react-icons/md";
 import { useFormStateStore } from "../stores/use-switch-store";
 
